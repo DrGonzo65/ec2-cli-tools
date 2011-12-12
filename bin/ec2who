@@ -1,0 +1,94 @@
+#!/usr/bin/env python
+
+import argparse
+import sys
+import re
+import os
+
+import boto.ec2
+
+
+def get_instances_for_query(ec2_conn, query):
+    filters = {}
+
+    # instance id
+    if re.match(r"^i-", args.query):
+        filters['instance-id'] = args.query
+
+    # ip
+    if re.match(r"^[\d.]+", args.query):
+        if re.match(r"^10\.", args.query):
+            filters["private-ip-address"] = args.query
+        else:
+            filters["ip-address"] = args.query
+
+    # dns
+    if re.match(r"^(ip|ec2)-", args.query):
+        dns = args.query
+
+        pairs = [("ec2", ".compute-1.amazonaws.com"), ("ip", ".ec2.internal")]
+        for sw, ew in pairs:
+            if dns.startswith(sw) and not dns.endswith(ew):
+                dns += ".*"
+                break
+
+        key = "private-dns-name" if dns.startswith("ip") else "dns-name"
+        filters[key] = dns
+
+    # instance name
+    if len(filters) == 0:
+        filters["tag:Name"] = args.query
+
+    reservations = ec2_conn.get_all_instances(filters=filters)
+    all_instances = [i for r in reservations for i in r.instances]
+    running_instances = [i for i in all_instances if i.public_dns_name]
+
+    return running_instances
+
+
+def print_instance_info(instance):
+    print "\t".join([
+        instance.tags.get("Name", "(None)"),
+        instance.id,
+        instance.placement,
+        instance.private_ip_address,
+        instance.public_dns_name.strip()])
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Query for EC2 instances")
+
+    parser.add_argument("query", metavar="QUERY",
+            help="An instance tag:Name or private/public IP address or hostname")
+
+    parser.add_argument("-k", metavar="KEY", dest="aws_key", required=False,
+            default=os.environ.get("AWS_ACCESS_KEY_ID"),
+            help="Amazon EC2 Key, defaults to $AWS_ACCESS_KEY_ID")
+
+    parser.add_argument("-s", metavar="SECRET", dest="aws_secret", required=False,
+            default=os.environ.get("AWS_SECRET_ACCESS_KEY"),
+            help="Amazon EC2 Secret, defaults to $AWS_SECRET_ACCESS_KEY")
+
+    parser.add_argument("-r", metavar="REGION", dest="aws_region", required=False,
+            default=os.environ.get("AWS_EC2_REGION", "us-east-1"),
+            help="Amazon EC2 Secret, defaults to $AWS_REGION or us-east-1")
+
+    args = parser.parse_args()
+
+    try:
+        ec2_conn = boto.ec2.connect_to_region(args.aws_region,
+            aws_access_key_id=args.aws_key,
+            aws_secret_access_key=args.aws_secret)
+    except boto.exception.NoAuthHandlerFound, e:
+        print >> sys.stderr, e.message
+        exit(1)
+
+    instances = get_instances_for_query(ec2_conn, args.query)
+
+    if len(instances) == 0:
+        print >> sys.stderr, "No instance(s) found"
+        exit(1)
+    else:
+        for instance in instances:
+            print_instance_info(instance)
+
