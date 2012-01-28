@@ -48,6 +48,13 @@ ec2ssh and ec2host:
     django2 ec2-132-45-67-89.compute-1.amazonaws.com
 
 
+ec2getsnaps:
+
+::
+    % ec2getsnaps db1
+    2012-01-28T02:04:18+0000 db1-xlog 100%
+
+
 Links
 `````
 
@@ -66,7 +73,7 @@ from setuptools import setup
 
 setup(
     name = "ec2-cli-tools",
-    version = "1",
+    version = "1.1",
     author = "Shayne Sweeney & Tyler Smalley",
     author_email = "team@flippath.com",
     description = "Helpful CLI utilities for querying and connecting to EC2 instances",
@@ -75,7 +82,7 @@ setup(
     url = "https://github.com/FlipPath/ec2-cli-tools",
     keywords = ["amazon", "aws", "ec2", "ami", "ssh", "cloud", "boto"],
     install_requires = ['boto>=1.0'],
-    scripts = ["bin/ec2who", "bin/ec2host", "bin/ec2ssh"],
+    scripts = ["bin/ec2who", "bin/ec2host", "bin/ec2ssh", "bin/ec2getsnaps"],
     classifiers = [
         "Programming Language :: Python",
         "Development Status :: 5 - Production/Stable",
