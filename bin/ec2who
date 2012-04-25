@@ -23,7 +23,7 @@ def get_instances_for_query(ec2_conn, query):
             filters["ip-address"] = args.query
 
     # dns
-    if re.match(r"^(ip|ec2)-", args.query):
+    if re.match(r"^(ip|ec2|domU)-", args.query):
         dns = args.query
 
         pairs = [("ec2", ".compute-1.amazonaws.com"), ("ip", ".ec2.internal")]
@@ -32,7 +32,7 @@ def get_instances_for_query(ec2_conn, query):
                 dns += ".*"
                 break
 
-        key = "private-dns-name" if dns.startswith("ip") else "dns-name"
+        key = "private-dns-name" if (dns.startswith("ip") or dns.startswith("domU")) else "dns-name"
         filters[key] = dns
 
     # instance name
