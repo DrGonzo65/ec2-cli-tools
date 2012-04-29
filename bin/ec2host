@@ -48,7 +48,7 @@ def ec2_active_instances(label_tag, filters):
 
 def main(argv):
     try:
-        opts, args = getopt.getopt(argv, "hLk:s:r:t:",
+        opts, args = getopt.getopt(argv, "hk:s:r:t:",
                                          ["help", "aws-key=", "aws-secret=", "region=", "tag="])
     except getopt.GetoptError, err:
         print >>sys.stderr, err
