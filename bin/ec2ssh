@@ -22,7 +22,7 @@ EOF
 test $# -eq 0 && { usage; exit; }
 
 # Process options
-cmd="ec2host"
+cmd="ec2hostcache"
 while getopts ":hk:s:r:t:" opt; do
     case $opt in
         h  ) usage; exit 1;;

@@ -82,7 +82,7 @@ setup(
     url = "https://github.com/FlipPath/ec2-cli-tools",
     keywords = ["amazon", "aws", "ec2", "ami", "ssh", "cloud", "boto"],
     install_requires = ['boto>=1.0'],
-    scripts = ["bin/ec2who", "bin/ec2host", "bin/ec2ssh", "bin/ec2getsnaps"],
+    scripts = ["bin/ec2who", "bin/ec2host", "bin/ec2hostcache", "bin/ec2ssh", "bin/ec2getsnaps"],
     classifiers = [
         "Programming Language :: Python",
         "Development Status :: 5 - Production/Stable",
