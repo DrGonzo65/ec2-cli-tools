@@ -1,0 +1,60 @@
+#!/bin/bash
+
+if [ "$1" == "--enable-completion-script" ]; then
+  shift
+  script_full_path=`stat -f "%N" $0`
+  cred_file=$1
+
+  if [ -n "$cred_file" ]; then
+    shift
+  fi
+
+  echo complete -C \"$cred_file $script_full_path --complete\" $@
+  exit
+fi
+
+if [ -z "$AWS_KEY" ]; then
+  echo "No AWS_KEY environment variable, bailing."
+  exit 2
+fi
+
+if [ "$1" == "--complete" ]; then
+  COMPLETION_MODE=1 
+  shift
+fi
+
+REFRESH_EVERY=86400 # 24hours
+CACHE_FILE="/tmp/ec2hostcache.$USER.$AWS_KEY"
+
+NOW=`date +%s`
+
+if [ -f "$CACHE_FILE" ]; then
+  LAST_MODIFIED=`stat -t "%t" -f "%m" $CACHE_FILE`
+  MAX_TS=$(($LAST_MODIFIED + $REFRESH_EVERY))
+
+  if [ "$NOW" -lt "$MAX_TS" ]; then
+    NO_REFRESH=1
+  fi
+fi
+
+if [ "$1" == "--refresh" ]; then
+  shift
+  NO_REFRESH=""
+fi
+
+if [ -z "$NO_REFRESH" ]; then
+  ec2host | grep -v "^None" > $CACHE_FILE
+fi
+
+if [ -n "$COMPLETION_MODE" ]; then
+  grep -Eo '^[^[:space:]]+' $CACHE_FILE | grep -E "^$2"
+else
+  HOST="$1"
+  EXACT_MATCH=`grep -E "^$HOST[[:space:]]" $CACHE_FILE`
+
+  if [ -n "$EXACT_MATCH" ]; then
+    echo $EXACT_MATCH | grep -Eo '[^[:space:]]+$'
+  else
+    grep -E "^$HOST.*[[:space:]]" $CACHE_FILE 1>&2
+  fi
+fi
