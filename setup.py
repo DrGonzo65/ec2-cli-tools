@@ -73,7 +73,7 @@ from setuptools import setup
 
 setup(
     name = "ec2-cli-tools",
-    version = "1.3",
+    version = "1.3.1",
     author = "Shayne Sweeney & Tyler Smalley & Mike Krieger",
     author_email = "team@flippath.com",
     description = "Helpful CLI utilities for querying and connecting to EC2 instances",
