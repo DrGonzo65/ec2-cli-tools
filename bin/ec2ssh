@@ -47,10 +47,13 @@ if [ -z "$inst" ]; then
 fi
 
 # support tag:value format for identifying instances
-IFS=":"; declare -a tagparts=($inst)
+OLDIFS=$IFS
+IFS=""; declare -a tagparts=($inst)
 
 tag="${tagparts[0]}"
 value="${tagparts[1]}"
+
+IFS=$OLDIFS
 
 if [ -z "$value" ]; then
     value="$inst"
