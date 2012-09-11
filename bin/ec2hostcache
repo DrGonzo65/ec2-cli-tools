@@ -42,8 +42,14 @@ if [ "$1" == "--refresh" ]; then
   NO_REFRESH=""
 fi
 
+if [ "$1" == "--add" ]; then
+    hostname=$(ec2host $2 | grep -v "^None")
+    echo "$2 $hostname" >> $CACHE_FILE
+    exit 0
+fi
+
 if [ -z "$NO_REFRESH" ]; then
-  ec2host | grep -v "^None" > $CACHE_FILE
+  ec2host | grep -v "^None" > $CACHE_FILE 
 fi
 
 if [ -n "$COMPLETION_MODE" ]; then
@@ -51,10 +57,9 @@ if [ -n "$COMPLETION_MODE" ]; then
 else
   HOST="$1"
   EXACT_MATCH=`grep -E "^$HOST[[:space:]]" $CACHE_FILE`
-
   if [ -n "$EXACT_MATCH" ]; then
     echo $EXACT_MATCH | grep -Eo '[^[:space:]]+$'
   else
-    grep -E "^$HOST.*[[:space:]]" $CACHE_FILE 1>&2
+    exit 1
   fi
 fi
