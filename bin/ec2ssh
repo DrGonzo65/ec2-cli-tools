@@ -1,7 +1,5 @@
 #!/bin/bash
 
-set -e
-
 usage() {
     cat<<EOF
 Usage: ec2-ssh [-k KEY] [-s SECRET] [-r REGION] [-t TAG] <instance-name>
@@ -61,8 +59,23 @@ else
     cmd="$cmd -t $tag"
 fi
 
-# get host from ec2-host command
+# get host from ec2hostcache command
 host=$(eval "$cmd $inst")
+retval=$?
+
+if [ $retval -ne 0 ]; then
+    echo "$inst not found in cache...Pulling from remote"
+    host=$(eval "ec2host $inst")
+    if [ -n "$host" ]; then
+        eval "$cmd --add $inst"
+        echo "Added $inst to cache"
+    fi
+fi
+
+if [ -z "$host" ]; then
+    echo "$inst not found"
+    exit 1
+fi
 
 # pass all other parameters (${@:2}) to ssh allowing
 # things like: ec2-ssh nginx uptime
