@@ -54,6 +54,17 @@ ec2getsnaps:
     % ec2getsnaps db1
     2012-01-28T02:04:18+0000 db1-xlog 100%
 
+ec2sshproxy:
+
+::
+~/.ssh/config
+
+    Host *.ec2
+        User ubuntu
+        ProxyCmd ec2sshproxy %h %p
+
+% ssh my-server-tag.ec2
+
 
 Links
 `````
@@ -65,6 +76,7 @@ Changelog
 `````````
 
 * 1.0 - initial release, addition of ec2who and migration of deprecated ec2ssh project
+* 1.4 - added ec2sshproxy
 """
 
 
@@ -73,7 +85,7 @@ from setuptools import setup
 
 setup(
     name = "ec2-cli-tools",
-    version = "1.3.2",
+    version = "1.4",
     author = "Shayne Sweeney & Tyler Smalley & Mike Krieger",
     author_email = "team@flippath.com",
     description = "Helpful CLI utilities for querying and connecting to EC2 instances",
@@ -82,7 +94,7 @@ setup(
     url = "https://github.com/FlipPath/ec2-cli-tools",
     keywords = ["amazon", "aws", "ec2", "ami", "ssh", "cloud", "boto"],
     install_requires = ['boto>=1.0'],
-    scripts = ["bin/ec2who", "bin/ec2host", "bin/ec2hostcache", "bin/ec2ssh", "bin/ec2getsnaps"],
+    scripts = ["bin/ec2who", "bin/ec2host", "bin/ec2hostcache", "bin/ec2ssh", "bin/ec2getsnaps", "bin/ec2sshproxy"],
     classifiers = [
         "Programming Language :: Python",
         "Development Status :: 5 - Production/Stable",
