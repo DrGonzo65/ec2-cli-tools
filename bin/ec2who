@@ -41,18 +41,19 @@ def get_instances_for_query(ec2_conn, query):
 
     reservations = ec2_conn.get_all_instances(filters=filters)
     all_instances = [i for r in reservations for i in r.instances]
-    running_instances = [i for i in all_instances if i.public_dns_name]
+    running_instances = [i for i in all_instances if i.public_dns_name or i.ip_address]
 
     return running_instances
 
 
 def print_instance_info(instance):
+    public_interface = instance.public_dns_name or instance.ip_address
     print "\t".join([
         instance.tags.get("Name", "(None)"),
         instance.id,
         instance.placement,
         instance.private_ip_address,
-        instance.public_dns_name.strip()])
+        public_interface.strip()])
 
 
 if __name__ == "__main__":
