@@ -77,6 +77,7 @@ Changelog
 
 * 1.0 - initial release, addition of ec2who and migration of deprecated ec2ssh project
 * 1.4 - added ec2sshproxy
+* 1.5 - added support for VPC hosts
 """
 
 
@@ -85,8 +86,8 @@ from setuptools import setup
 
 setup(
     name = "ec2-cli-tools",
-    version = "1.4",
-    author = "Shayne Sweeney & Tyler Smalley & Mike Krieger",
+    version = "1.5",
+    author = "Shayne Sweeney & Tyler Smalley & Mike Krieger & Nick Shortway",
     author_email = "team@flippath.com",
     description = "Helpful CLI utilities for querying and connecting to EC2 instances",
     long_description = __doc__,
