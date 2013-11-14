@@ -29,7 +29,13 @@ CACHE_FILE="/tmp/ec2hostcache.$USER.$AWS_KEY"
 NOW=`date +%s`
 
 if [ -f "$CACHE_FILE" ]; then
-  LAST_MODIFIED=`stat -t "%t" -f "%m" $CACHE_FILE`
+  if [ -f "/etc/redhat-release"  -o -f "/etc/debian_version" ]; then
+    # RedHat/CentOS/Debian version
+    LAST_MODIFIED=`stat --format="%Y" $CACHE_FILE`
+  else
+    # OSX version
+    LAST_MODIFIED=`stat -t "%t" -f "%m" $CACHE_FILE`
+  fi
   MAX_TS=$(($LAST_MODIFIED + $REFRESH_EVERY))
 
   if [ "$NOW" -lt "$MAX_TS" ]; then
@@ -43,13 +49,13 @@ if [ "$1" == "--refresh" ]; then
 fi
 
 if [ "$1" == "--add" ]; then
-    hostname=$(ec2host $2 | grep -v "^None")
-    echo "$2 $hostname" >> $CACHE_FILE
-    exit 0
+  hostname=$(ec2host $2 | grep -v "^None")
+  echo "$2 $hostname" >> $CACHE_FILE
+  exit 0
 fi
 
 if [ -z "$NO_REFRESH" ]; then
-  ec2host | grep -v "^None" > $CACHE_FILE 
+  ec2host | grep -v "^None" > $CACHE_FILE
 fi
 
 if [ -n "$COMPLETION_MODE" ]; then
@@ -57,6 +63,7 @@ if [ -n "$COMPLETION_MODE" ]; then
 else
   HOST="$1"
   EXACT_MATCH=`grep -E "^$HOST[[:space:]]" $CACHE_FILE`
+
   if [ -n "$EXACT_MATCH" ]; then
     echo $EXACT_MATCH | grep -Eo '[^[:space:]]+$'
   else
