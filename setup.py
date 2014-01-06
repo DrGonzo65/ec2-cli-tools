@@ -86,7 +86,7 @@ from setuptools import setup
 
 setup(
     name = "ec2-cli-tools",
-    version = "1.5.1",
+    version = "1.5.2",
     author = "Shayne Sweeney & Tyler Smalley & Mike Krieger & Nick Shortway",
     author_email = "team@flippath.com",
     description = "Helpful CLI utilities for querying and connecting to EC2 instances",
